@@ -1,0 +1,6 @@
+title: "UTS PSD - LULC Jawa Timur"
+author: "Joni Kumar Meghwar - 240411100234"
+copyright: "2026"
+execute:
+  execute_notebooks: "off"
+only_build_toc_files: true

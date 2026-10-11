@@ -1,0 +1,9 @@
+streamlit>=1.49,<2
+pandas>=2.2,<3
+numpy>=1.26,<3
+matplotlib>=3.8,<4
+seaborn>=0.13,<1
+pillow>=10,<13
+folium>=0.17,<1
+geopandas>=1.0,<2
+shapely>=2.0,<3

@@ -1,0 +1,13 @@
+source_feature,class,action,reason
+70,Pemukiman,excluded,Too few points in geometry component[112.715118 -7.258084]; no polygon area after repair
+71,Pemukiman,excluded,Too few points in geometry component[112.715081 -7.25812]; no polygon area after repair
+124,Sawah,repaired,Self-intersection[112.427485110264 -7.53187347537107]
+142,Sawah,repaired,Self-intersection[112.412311893095 -7.53757572150827]
+145,Sawah,repaired,Self-intersection[112.408109465465 -7.54110687268195]
+148,Sawah,excluded,A linearring requires at least 4 coordinates.
+160,Hutan Mangrove,repaired,Self-intersection[112.84133531889 -7.31883556236116]
+179,Hutan Mangrove,repaired,Self-intersection[112.83526546046 -7.40062029553674]
+180,Hutan Mangrove,repaired,Self-intersection[112.832469695617 -7.40443667095461]
+184,Hutan Mangrove,repaired,Self-intersection[112.692628515 -7.14538158234592]
+211,Hutan Non-Mangrove,repaired,Self-intersection[113.840628291845 -8.53964402271946]
+234,Hutan Non-Mangrove,repaired,Self-intersection[113.852171315047 -8.51212479099214]

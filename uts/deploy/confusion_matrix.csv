@@ -1,0 +1,6 @@
+Aktual,Air,Hutan Mangrove,Hutan Non-Mangrove,Pemukiman,Sawah
+Air,12,2,0,0,1
+Hutan Mangrove,0,15,0,0,0
+Hutan Non-Mangrove,0,0,15,0,0
+Pemukiman,0,0,0,15,0
+Sawah,0,0,0,0,15

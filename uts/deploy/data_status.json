@@ -1,0 +1,9 @@
+{
+  "source_sha256": "64519b1eedc6f4f344242b8c7b060c108a9034584952dd67f424e2c4f15bc37b",
+  "original_polygons": 250,
+  "usable_polygons": 247,
+  "excluded": 3,
+  "repaired": 9,
+  "overlap_pairs": 15,
+  "training_complete": true
+}

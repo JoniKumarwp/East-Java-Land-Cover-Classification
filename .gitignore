@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+_build/
+.streamlit/secrets.toml
+uts/data/csv/hasil_s2_piksel/job_*/
+uts/data/csv/hasil_s2_piksel/daftar_job.csv
+*.tif
+*.tiff

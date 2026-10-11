@@ -1,0 +1,8 @@
+format: jb-book
+root: intro
+chapters:
+  - file: uts/business-understanding-uts
+  - file: uts/data-understanding-uts
+  - file: uts/code/crawling
+  - file: uts/code/landuseCover
+  - file: uts/deployment-guide

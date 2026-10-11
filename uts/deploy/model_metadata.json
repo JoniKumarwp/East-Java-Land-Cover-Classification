@@ -1,0 +1,28 @@
+{
+  "features": [
+    "B02",
+    "B03",
+    "B04",
+    "B08",
+    "B8A",
+    "B11",
+    "NDVI",
+    "NDWI",
+    "MNDWI",
+    "NDBI",
+    "NDMI_8A"
+  ],
+  "bands": [
+    "B02",
+    "B03",
+    "B04",
+    "B08",
+    "B8A",
+    "B11"
+  ],
+  "k": 5,
+  "split": "polygon-stratified 70/30, random_state=42",
+  "pixel_csv_sha256": "67cfb419386176b75a70c600ceca95695537df6843639008355d91593bc22e71",
+  "source_sha256": "64519b1eedc6f4f344242b8c7b060c108a9034584952dd67f424e2c4f15bc37b",
+  "scope": "Mean spectral features of sample polygons; not a province-wide raster map"
+}

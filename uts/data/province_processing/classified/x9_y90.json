@@ -1,0 +1,53 @@
+{
+  "tile_id": "x9_y90",
+  "fingerprint": {
+    "source_sha256": "49282ccd9e9a149512cffe93cbd89780bcc6714e646886ddbf0e6f536e945515",
+    "model_sha256": "d13d0f0fc8fc5e19c4e762fd1930dbb5c531edc370ba0d9784811c738b9adcdc",
+    "resolution_m": 100,
+    "bounds": [
+      900000,
+      9000000,
+      1000000,
+      9100000
+    ]
+  },
+  "target_pixels": 1218,
+  "valid_pixels": 1218,
+  "counts": {
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 1051,
+    "5": 167
+  },
+  "images": [
+    {
+      "class_code": 4,
+      "path": "layers/d13d0f0fc8fc_49282ccd9e9a_100m/x9_y90/class_4.png",
+      "bounds": [
+        [
+          -9.028562381058311,
+          114.62856626381054
+        ],
+        [
+          -8.116728686222247,
+          115.54434664885324
+        ]
+      ]
+    },
+    {
+      "class_code": 5,
+      "path": "layers/d13d0f0fc8fc_49282ccd9e9a_100m/x9_y90/class_5.png",
+      "bounds": [
+        [
+          -9.028562381058311,
+          114.62856626381054
+        ],
+        [
+          -8.116728686222247,
+          115.54434664885324
+        ]
+      ]
+    }
+  ]
+}

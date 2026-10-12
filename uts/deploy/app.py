@@ -68,6 +68,13 @@ def section_label(number, name):
 BASE = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE.parent / "code"))
 from pipeline import make_map, CLASSES
+import importlib.util
+VIEWER_BUILD="2026.10.12.2"
+viewer_path=BASE/"classified_map.py"
+viewer_spec=importlib.util.spec_from_file_location("east_java_viewer",viewer_path)
+viewer_module=importlib.util.module_from_spec(viewer_spec)
+viewer_spec.loader.exec_module(viewer_module)
+render_classification=viewer_module.render_classification
 
 CLASS_NAMES = {
     "Sawah": "Farmland",
@@ -113,7 +120,16 @@ def english_table(data):
 def map_html(data, selected, prediction=False):
     # Build from the original labels, so the trained model/data are untouched.
     # Translate only the presentation copy embedded in the Leaflet map.
-    html=make_map(data,selected=selected,prediction=prediction).get_root().render()
+    map_view=make_map(data,selected=selected,prediction=prediction)
+    # Open on the whole province, independently of sample locations or class filters.
+    province_path=BASE/"province.geojson"
+    if province_path.exists():
+        province=read_geojson(str(province_path),province_path.stat().st_mtime_ns)
+        west,south,east,north=province.to_crs("EPSG:4326").total_bounds
+    else:
+        west,south,east,north=(110.89871976800303, -8.780360000213708, 116.27018890199643, -5.052962199505109)
+    map_view.fit_bounds([[float(south),float(west)],[float(north),float(east)]],padding=(25,25))
+    html=map_view.get_root().render()
     translations={
         **CLASS_NAMES,
         "Batas Jawa Timur":"East Java boundary", "Satelit Esri":"Esri satellite",
@@ -156,6 +172,14 @@ samples=spatial("samples.geojson")
 summary=table("sample_summary.csv")
 metrics=table("ringkasan_model_knn.csv").set_index("Metrik").Nilai if trained else None
 
+province_manifest_path=BASE/"province_classification/manifest.json"
+province_meta=json.loads(province_manifest_path.read_text()) if province_manifest_path.exists() else None
+province_ready=bool(province_meta and province_meta.get("complete"))
+
+@st.cache_data
+def province_map_cached(base,manifest_stamp,viewer_stamp,selected,opacity,show_samples):
+    return render_classification(base,list(selected),opacity=opacity,show_samples=show_samples)
+
 with st.sidebar:
     st.markdown('<div class="dash-brand"><div class="dash-logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7l9-5 9 5-9 5-9-5zm0 5l9 5 9-5M3 17l9 5 9-5"/></svg></div><div><div class="dash-brand-title">East Java Atlas</div><div class="dash-brand-sub">Land-cover intelligence</div></div></div>',unsafe_allow_html=True)
     st.divider()
@@ -166,13 +190,13 @@ with st.sidebar:
     selected=[cls for cls in CLASSES if st.checkbox(CLASS_NAMES[cls],value=True,key=f"map_{cls}")]
     st.divider()
     st.caption("EXPLORE THE DASHBOARD")
-    st.markdown('<nav class="dash-nav"><a href="#evaluation-map"><span>01</span>Spatial overview</a><a href="#model-performance"><span>02</span>Model performance</a><a href="#prediction-details"><span>03</span>Prediction explorer</a><a href="#sample-map"><span>04</span>Sample atlas</a><a href="#data-exploration"><span>05</span>Data insights</a><a href="#project-purpose"><span>06</span>About the study</a></nav>',unsafe_allow_html=True)
+    st.markdown('<nav class="dash-nav"><a href="#evaluation-map"><span>01</span>Province classification</a><a href="#model-performance"><span>02</span>Model performance</a><a href="#prediction-details"><span>03</span>Prediction explorer</a><a href="#sample-map"><span>04</span>Sample atlas</a><a href="#data-exploration"><span>05</span>Data insights</a><a href="#project-purpose"><span>06</span>About the study</a></nav>',unsafe_allow_html=True)
     st.divider()
     st.caption("Sentinel-2 · Level-2A\n\nScaled k-NN · k = 5\n\nBands: B02, B03, B04, B08, B8A, B11")
     if trained:st.success("Model results available")
     else:st.info("Digitized samples available")
 
-model_badge="Model evaluated" if trained else "Sample data available"
+model_badge="Province classification available" if province_ready else "Sample model evaluated" if trained else "Sample data available"
 st.markdown(f"""<section class="dash-hero">
 <div class="dash-eyebrow">EARTH OBSERVATION / EAST JAVA, INDONESIA</div>
 <h1 class="dash-hero-title">Land cover, in focus.</h1>
@@ -200,21 +224,36 @@ if trained:
 else:
     st.info("This dashboard currently shows digitized samples. Model evaluation will appear when trained results are available.")
 
-section_label(1,"Spatial overview")
-st.header("Explore the landscape",anchor="evaluation-map")
+section_label(1,"Province classification")
+st.header("East Java land-cover classification",anchor="evaluation-map")
 with st.container(border=True,key="evaluation-map-frame"):
-    st.subheader("Classification on satellite imagery")
-    st.caption("Switch between ground truth and predictions. Filter land-cover classes in the sidebar.")
-    if trained:
-        show_predictions=st.toggle("Color test polygons by their predicted class",value=True)
-        components.html(map_html(spatial("evaluation.geojson"),selected,prediction=show_predictions),height=620,scrolling=False)
-        st.markdown('<div class="dash-legend"><span class="dash-legend-item"><i style="background:#0284c7"></i>Training samples</span><span class="dash-legend-item"><i style="background:#16a34a"></i>Correct predictions</span><span class="dash-legend-item"><i style="background:#f97316"></i>Incorrect predictions</span></div>',unsafe_allow_html=True)
-        st.caption("Cyan boundaries identify training polygons; dashed magenta boundaries identify test polygons. Hover over polygons to compare actual and predicted classes. Class filters follow predicted colors when prediction mode is enabled.")
+    if province_ready:
+        st.caption("Pixel-level predictions over satellite imagery. Use the class checkboxes to isolate farmland, buildings, water, forest, or mangroves.")
+        a,b=st.columns([2,1])
+        with a:layer_opacity=st.slider("Classification opacity",min_value=0.1,max_value=1.0,value=0.7,step=0.05)
+        with b:show_samples=st.checkbox("Show reference sample boundaries",value=False)
+        viewer_stamp=(VIEWER_BUILD,viewer_path.stat().st_mtime_ns,(BASE/"map_assets/leaflet.js").stat().st_mtime_ns,(BASE/"map_assets/leaflet.css").stat().st_mtime_ns)
+        html_map=province_map_cached(str(BASE),province_manifest_path.stat().st_mtime_ns,viewer_stamp,tuple(selected),layer_opacity,show_samples)
+        components.html(html_map,height=650,scrolling=False)
+        st.download_button("Open map separately: download HTML",html_map.encode("utf-8"),"east_java_classification_map.html","text/html",key="standalone-map-download")
+        stats=pd.read_csv(BASE/"province_classification/class_summary.csv")
+        for col,(_,row) in zip(st.columns(5),stats.iterrows()):
+            with col:
+                st.metric(row["Class"],f"{row['Percentage']:.2f}%")
+                st.caption(f"{int(row['Pixels']):,} grid pixels")
+        res=province_meta['settings']['resolution_m'];coverage=province_meta['valid_coverage_pct'];buffer=province_meta['settings']['coastal_buffer_km']
+        st.caption(f"Classification grid: {res} m · Valid classified pixels: {province_meta['valid_pixels']:,} · Valid-data coverage: {coverage:.2f}% · Study area: East Java plus a {buffer:g} km coastal buffer.")
+        if coverage<99:st.info("Transparent gaps are missing or masked observations. Class percentages use valid classified pixels only.")
+        st.caption("The pixel classifier is separate from the polygon model evaluated below. Its held-out pixel accuracy is measured within sampled polygons, not verified across every location in the province.")
+        st.caption(f"Pixel-model test accuracy: {province_meta['model']['test_accuracy_pct']:.2f}% · Pixel-model Kappa: {province_meta['model']['test_kappa']:.4f}.")
+        st.download_button("Download classification statistics",stats.to_csv(index=False).encode(),"east_java_classification_statistics.csv","text/csv")
     else:
-        st.info("The evaluation map is not available yet. Explore the sample map below.")
+        st.info("The province-wide classification map is awaiting processed satellite data. The map below shows your digitized reference polygons only.")
+        components.html(map_html(samples,selected),height=620,scrolling=False)
+        st.caption("Reference classes only. No training/test markers or province-wide predictions are shown.")
 
 section_label(2,"Model performance")
-st.header("How well does the model perform?",anchor="model-performance")
+st.header("Polygon-model performance",anchor="model-performance")
 if trained:
     pred=table("prediksi_data_uji.csv")
     left,right=st.columns(2)
@@ -331,7 +370,9 @@ with st.container(border=True):
     with st.expander("Method and interpretation"):
         st.write("The workflow follows CRISP-DM: business understanding, data understanding, preparation, modeling, evaluation, and deployment. Features are averaged within sample polygons; the 70/30 split is stratified at polygon level, and the scaler is fitted only on training data.")
         st.write("B8A, B11, and B04 support vegetation and moisture analysis. B08 is retained for the reference indices. Resampling bands from 20 m to a 10 m grid aligns observations without creating new spatial detail.")
-        st.write("The model classifies sampled polygons. It does not map every pixel across East Java. Nearby samples can share spectral and geographic characteristics; spatially independent block testing would provide stronger evidence of regional generalization.")
+        st.write("The original model evaluates mean features of sampled polygons. A separate balanced pixel model produces the province-wide raster overlay. Pixel-map percentages describe valid classified grid cells in the stated study area, including its coastal buffer; masked observations are excluded. Spatially independent validation would provide stronger evidence of regional generalization.")
 st.divider()
 st.caption("East Java Land Cover · Joni Kumar Meghwar · 240411100234")
 st.caption("Workflow adapted from Muhammad Ainul Fuady/PSD. Digitized samples supplied by Joni Kumar Meghwar.")
+
+st.caption(f"Map viewer build {VIEWER_BUILD}")

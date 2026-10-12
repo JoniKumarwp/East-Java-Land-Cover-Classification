@@ -1,0 +1,96 @@
+{
+  "training_settings": {
+    "train_sha256": "18909693fecb8fa0d2b4d35f477e9c8e0ddbdea24bb1efbf28f2be146b8269e4",
+    "test_sha256": "6ac748afe199ad4cd55f3ca522682c6ec259c4392dcfa11587ed5ae0d2218338",
+    "max_per_class": 2000,
+    "features": [
+      "B02",
+      "B03",
+      "B04",
+      "B08",
+      "B8A",
+      "B11",
+      "NDVI",
+      "NDWI",
+      "MNDWI",
+      "NDBI",
+      "NDMI_8A"
+    ],
+    "k": 5
+  },
+  "model_sha256": "d13d0f0fc8fc5e19c4e762fd1930dbb5c531edc370ba0d9784811c738b9adcdc",
+  "features": [
+    "B02",
+    "B03",
+    "B04",
+    "B08",
+    "B8A",
+    "B11",
+    "NDVI",
+    "NDWI",
+    "MNDWI",
+    "NDBI",
+    "NDMI_8A"
+  ],
+  "bands": [
+    "B02",
+    "B03",
+    "B04",
+    "B08",
+    "B8A",
+    "B11"
+  ],
+  "k": 5,
+  "balanced_pixels_per_class": 1557,
+  "training_pixels": 7785,
+  "testing_pixels": 49327,
+  "test_accuracy_pct": 94.41685081192855,
+  "test_kappa": 0.9068842228677455,
+  "macro_f1": 0.8900868993056397,
+  "test_scope": "Pixels from held-out polygons. Spatially nearby polygons may still be correlated.",
+  "classification_report": {
+    "Air": {
+      "precision": 0.966455499013397,
+      "recall": 0.8530571088092401,
+      "f1-score": 0.9062226117440841,
+      "support": 10909.0
+    },
+    "Hutan Mangrove": {
+      "precision": 0.8204717530576587,
+      "recall": 0.9742392807745505,
+      "f1-score": 0.8907682579829276,
+      "support": 5784.0
+    },
+    "Hutan Non-Mangrove": {
+      "precision": 0.9986894768533277,
+      "recall": 0.9731483398909367,
+      "f1-score": 0.9857534917055605,
+      "support": 28974.0
+    },
+    "Pemukiman": {
+      "precision": 0.7413793103448276,
+      "recall": 0.9595536959553695,
+      "f1-score": 0.8364741641337387,
+      "support": 717.0
+    },
+    "Sawah": {
+      "precision": 0.7489779231398201,
+      "recall": 0.9337410805300713,
+      "f1-score": 0.8312159709618875,
+      "support": 2943.0
+    },
+    "accuracy": 0.9441685081192855,
+    "macro avg": {
+      "precision": 0.8551947924818062,
+      "recall": 0.9387479011920336,
+      "f1-score": 0.8900868993056397,
+      "support": 49327.0
+    },
+    "weighted avg": {
+      "precision": 0.9520244805905222,
+      "recall": 0.9441685081192855,
+      "f1-score": 0.9456368382952763,
+      "support": 49327.0
+    }
+  }
+}
